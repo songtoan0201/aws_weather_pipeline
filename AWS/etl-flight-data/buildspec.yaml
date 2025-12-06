@@ -1,0 +1,27 @@
+version: 0.2
+
+env:
+  variables:
+    PROJECT_NAME: "etl-flight-data"
+    PATH_SCRIPT: "AWS/etl-flight-data"
+    BUCKET_NAME: "scripts-personal-projects"    
+
+phases:
+  pre_build:
+    commands:
+      - echo Uploading the script to S3...
+      - aws s3 cp --recursive $PATH_SCRIPT s3://scripts-personal-projects/aws_glue/$PROJECT_NAME --exclude "src/*"
+
+  build:
+    commands:
+      - echo Checking if AWS Glue job exists...
+      - export GLUE_JOB_NAME="glue-job-$PROJECT_NAME"
+      - export GLUE_JOB_CONFIG="$PATH_SCRIPT/glue_job_config.json"
+      - JOB_EXISTS=$(aws glue get-job --job-name $GLUE_JOB_NAME 2>/dev/null || echo "NOT_FOUND")
+      - if [ "$JOB_EXISTS" = "NOT_FOUND" ]; then
+          echo Glue job not found. Creating a new job...;
+          aws glue create-job --name $GLUE_JOB_NAME --cli-input-json file://$GLUE_JOB_CONFIG;
+        else
+          echo Glue job exists. Updating the job...;
+          aws glue update-job --job-name $GLUE_JOB_NAME --job-update file://$GLUE_JOB_CONFIG;
+        fi

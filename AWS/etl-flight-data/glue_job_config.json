@@ -1,0 +1,21 @@
+{
+    "Role": "arn:aws:iam::864826018661:role/GlueETLRole",
+    "Command": {
+        "Name": "glueetl",
+        "ScriptLocation": "s3://scripts-personal-projects/aws_glue/etl-flight-data/main.py"
+    },
+    "DefaultArguments": {
+        "--TempDir": "s3://scripts-personal-projects/aws_glue/temp/",
+        "--job-bookmark-option": "job-bookmark-enable",
+        "--job-language": "python",
+        "--enable-metrics": "",
+        "--extra-py-files": "",
+        "--enable-continuous-cloudwatch-log": "true",
+        "--etl-enable-container-telemetry-collection": "true"
+    },
+    "MaxRetries": 0,
+    "Timeout": 2880,
+    "WorkerType": "Standard",
+    "NumberOfWorkers": 1,
+    "GlueVersion": "4.0"
+}
